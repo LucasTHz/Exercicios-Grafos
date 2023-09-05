@@ -7,7 +7,9 @@ int main(int argc, char **argv)
     ifstream in("input.txt");
     Grafo *grafo = new Grafo(in);
     grafo->imprime();
-    grafo->buscaProfundidade();
+    // grafo->buscaProfundidade();
+    grafo->buscaProLargura();
+    grafo->imprime();
 
     // printf("Grafo original \n");
     // grafo->imprime();

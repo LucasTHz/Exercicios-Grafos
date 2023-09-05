@@ -91,6 +91,9 @@ public:
   int numComponentes();
   vector<int> ordemTopologica();
   void visitaDfsComOrdem(int u, int *cor, int *antecessor, vector<int> &ordem);
+  void visitaBfs(int u, int *cor, int *dist, int *antecessor);
+  void buscaProLargura();
+
   ~Grafo();
 };
 
@@ -242,7 +245,7 @@ int Grafo::numComponentes()
       this->visitaDfs(u, cor, antecessor);
     }
   }
-  return componentes
+  return componentes;
 }
 
 void Grafo::visitaDfs(int u, int *cor, int *antecessor)
@@ -357,6 +360,61 @@ void Grafo::visitaDfsComOrdem(int u, int *cor, int *antecessor, vector<int> &ord
 
     cor[u] = 2; // o 2 é preto
     ordem.push_back(u);
+  }
+}
+
+void Grafo::visitaBfs(int u, int *cor, int *dist, int *antecessor)
+{
+  queue<int> fila;
+  fila.push(u);
+
+  while (!fila.empty())
+  {
+    int u = fila.front();
+    fila.pop();
+    if (!this->listaAdjVazia(u))
+    {
+      Aresta *adj = this->primeiroListaAdj(u);
+      while (adj != NULL) // para cada v adjacente a u
+      {
+        int v = adj->_v2();
+        if (cor[v] == 0)
+        {
+          cout << "Visitou: " << v << endl;
+          cout << "Mudou para cinza: " << endl;
+          cor[v] = 1;
+          dist[v] = dist[u] + 1;
+          antecessor[v] = u;
+          fila.push(v);
+        }
+        delete adj;
+        adj = this->proxAdj(u);
+      }
+
+      cor[u] = 2; // o 2 é preto
+      cout << "Mudou para preto: " << endl;
+    }
+  }
+}
+
+void Grafo::buscaProLargura()
+{
+  int *cor = new int[this->numVertices];
+  int *antecessor = new int[this->numVertices];
+  int *dist = new int[this->numVertices];
+
+  for (int u = 0; u < this->numVertices; u++)
+  {
+    cor[u] = 0;
+    antecessor[u] = -1;
+    dist[u] = __INT_MAX__;
+  }
+  for (int u = 0; u < this->numVertices; u++)
+  {
+    if (cor[u] == 0) // o 0 é branco
+    {
+      this->visitaBfs(u, cor, dist, antecessor);
+    }
   }
 }
 Grafo::~Grafo()
