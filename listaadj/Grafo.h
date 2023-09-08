@@ -251,7 +251,7 @@ int Grafo::numComponentes()
 void Grafo::visitaDfs(int u, int *cor, int *antecessor)
 {
   cor[u] = 1; // o 1 é cinza
-  cout << "cinza:" << u << endl;
+  // cout << "cinza:" << u << endl;
   if (!this->listaAdjVazia(u))
   {
     Aresta *adj = this->primeiroListaAdj(u);
@@ -266,7 +266,7 @@ void Grafo::visitaDfs(int u, int *cor, int *antecessor)
       delete adj;
       adj = this->proxAdj(u);
     }
-    cout << "preto:" << u << endl;
+    // cout << "preto:" << u << endl;
 
     cor[u] = 2; // o 2 é preto
   }
@@ -275,7 +275,7 @@ void Grafo::visitaDfs(int u, int *cor, int *antecessor)
 bool Grafo::aciclico(int u, int *cor, int *antecessor)
 {
   cor[u] = 1; // o 1 é cinza
-  cout << "cinza:" << u << endl;
+  // cout << "cinza:" << u << endl;
   if (!this->listaAdjVazia(u))
   {
     Aresta *adj = this->primeiroListaAdj(u);
@@ -292,9 +292,10 @@ bool Grafo::aciclico(int u, int *cor, int *antecessor)
       delete adj;
       adj = this->proxAdj(u);
     }
-    cout << "preto:" << u << endl;
+    // cout << "preto:" << u << endl;
 
     cor[u] = 2; // o 2 é preto
+    return true;
   }
 }
 
@@ -303,6 +304,7 @@ void Grafo::buscaProfundidadeAciclico()
   int *cor = new int[this->numVertices];
   int *antecessor = new int[this->numVertices];
 
+  // colore os vertices de branco
   for (int u = 0; u < this->numVertices; u++)
   {
     cor[u] = 0;
@@ -312,7 +314,16 @@ void Grafo::buscaProfundidadeAciclico()
   {
     if (cor[u] == 0) // o 0 é branco
     {
-      this->aciclico(u, cor, antecessor);
+      if (!this->aciclico(u, cor, antecessor)) // o 1 é cinza
+      {
+        cout << "Grafo é acíclico" << endl;
+        return;
+      }
+      else
+      {
+        cout << "Grafo não é acíclico" << endl;
+        return;
+      }
     }
   }
 }
@@ -341,7 +352,7 @@ vector<int> Grafo::ordemTopologica()
 void Grafo::visitaDfsComOrdem(int u, int *cor, int *antecessor, vector<int> &ordem)
 {
   cor[u] = 1; // o 1 é cinza
-  cout << "cinza:" << u << endl;
+  // cout << "cinza:" << u << endl;
   if (!this->listaAdjVazia(u))
   {
     Aresta *adj = this->primeiroListaAdj(u);
@@ -356,7 +367,7 @@ void Grafo::visitaDfsComOrdem(int u, int *cor, int *antecessor, vector<int> &ord
       delete adj;
       adj = this->proxAdj(u);
     }
-    cout << "preto:" << u << endl;
+    // cout << "preto:" << u << endl;
 
     cor[u] = 2; // o 2 é preto
     ordem.push_back(u);
