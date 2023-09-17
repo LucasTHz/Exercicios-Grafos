@@ -6,10 +6,12 @@ int main(int argc, char **argv)
 {
     ifstream in("input.txt");
     Grafo *grafo = new Grafo(in);
-    grafo->imprime();
+    vector<int> v;
+    // grafo->imprime();
     // grafo->buscaProfundidade();
-    grafo->buscaProLargura();
-    grafo->imprime();
+    // grafo->buscaProLargura();
+    // grafo->imprime();
+    grafo->buscaMenorCaminho(6, 0);
 
     // printf("Grafo original \n");
     // grafo->imprime();

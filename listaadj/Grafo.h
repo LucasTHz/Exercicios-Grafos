@@ -93,6 +93,8 @@ public:
   void visitaDfsComOrdem(int u, int *cor, int *antecessor, vector<int> &ordem);
   void visitaBfs(int u, int *cor, int *dist, int *antecessor);
   void buscaProLargura();
+  void buscaMenorCaminho(int u, int v);
+  void imprimeCaminho(int u, int v, int *antecessor);
 
   ~Grafo();
 };
@@ -417,6 +419,40 @@ void Grafo::buscaProLargura()
     }
   }
 }
+
+void Grafo::imprimeCaminho(int u, int v, int *antecessor)
+{
+
+  if (u == v)
+    cout << v << endl;
+  else if (antecessor[v] == -1)
+  {
+
+    cout << "Não exite caminho" << endl;
+  }
+  else
+  {
+    imprimeCaminho(u, antecessor[v], antecessor);
+    cout << v << endl;
+  }
+}
+void Grafo::buscaMenorCaminho(int u, int v)
+{
+  int *cor = new int[this->numVertices];
+  int *antecessor = new int[this->numVertices];
+  int *dist = new int[this->numVertices];
+
+  for (int u = 0; u < this->numVertices; u++)
+  {
+    cor[u] = 0;
+    antecessor[u] = -1;
+    dist[u] = __INT_MAX__;
+  }
+
+  this->visitaBfs(u, cor, dist, antecessor);
+  this->imprimeCaminho(u, v, antecessor);
+}
+
 Grafo::~Grafo()
 {
   delete[] this->adj;
