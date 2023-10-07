@@ -27,6 +27,10 @@ public:
     int _peso() { return this->peso; }
     int _v1() { return this->v1; }
     int _v2() { return this->v2; }
+    bool operator<(const Aresta &p) const
+    {
+      return peso < p.peso;
+    }
     ~Aresta() {}
   };
 
@@ -95,6 +99,9 @@ public:
   void buscaProLargura();
   void buscaMenorCaminho(int u, int v);
   void imprimeCaminho(int u, int v, int *antecessor);
+  void kruskal();
+  int encontreConjunto(int *conjunto, int x);
+  void unirConjunto(int *conjunto, int x, int y);
 
   ~Grafo();
 };
@@ -451,6 +458,62 @@ void Grafo::buscaMenorCaminho(int u, int v)
 
   this->visitaBfs(u, cor, dist, antecessor);
   this->imprimeCaminho(u, v, antecessor);
+}
+
+void Grafo::kruskal()
+{
+  vector<Aresta> S;
+  int *conjunto = new int[this->_numVertices()];
+
+  // criar conjunto
+  memset(conjunto, -1, sizeof(int) * this->_numVertices());
+
+  vector<Aresta> A;
+
+  for (int v = 0; v < this->numVertices; v++)
+  {
+    if (!this->listaAdjVazia(v))
+    {
+      Aresta *adj = this->primeiroListaAdj(v);
+      while (adj != NULL)
+      {
+        A.push_back(*adj);
+        delete adj;
+        adj = this->proxAdj(v);
+      }
+    }
+  }
+  // printf("Conjunto: %d\n", this->_numVertices());
+  sort(A.begin(), A.end());
+
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    if (encontreConjunto(conjunto, A[i]._v1()) != encontreConjunto(conjunto, A[i]._v2()))
+    {
+
+      S.push_back(A[i]);
+      unirConjunto(conjunto, A[i]._v1(), A[i]._v2());
+    }
+  }
+
+  for (int i = 0; i < S.size(); i++)
+  {
+    cout << S[i]._v1() << " " << S[i]._v2() << " " << S[i]._peso() << endl;
+  }
+}
+
+int Grafo::encontreConjunto(int *conjunto, int x)
+{
+  if (conjunto[x] == -1)
+    return x;
+  return encontreConjunto(conjunto, conjunto[x]);
+}
+
+void Grafo::unirConjunto(int *conjunto, int x, int y)
+{
+  int conjuntoX = encontreConjunto(conjunto, x);
+  int conjuntoY = encontreConjunto(conjunto, y);
+  conjunto[conjuntoX] = conjuntoY;
 }
 
 Grafo::~Grafo()
