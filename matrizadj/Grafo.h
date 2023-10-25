@@ -48,6 +48,13 @@ public:
   int _numVertices() const;
   Grafo *grafoTransposto();
   Grafo *grafoNaoDirecionado();
+  void listaAdj(int v);
+  int grauVertice(int v);
+  bool completo();
+  bool regular();
+  bool euleriano();
+  bool subeuleriano();
+  void buscaProfundidade(int v, bool visitados[]);
   ~Grafo();
 };
 
@@ -200,10 +207,99 @@ Grafo *Grafo::grafoTransposto()
 Grafo *Grafo::grafoNaoDirecionado()
 {
   Grafo *grafoND = new Grafo(this->numVertices);
-  // Ex5: Implementar o grafo não direcionado
+  for (int v = 0; v < this->numVertices; v++)
+    if (!this->listaAdjVazia(v))
+    {
+      Aresta *adj = this->primeiroListaAdj(v);
+      while (adj != NULL)
+      {
+        grafoND->insereAresta(adj->_v1(), adj->_v2(), adj->_peso());
+        grafoND->insereAresta(adj->_v2(), adj->_v1(), adj->_peso());
+        delete adj;
+        adj = this->proxAdj(v);
+      }
+    }
   return grafoND;
 }
 
+void Grafo::listaAdj(int v)
+{
+
+  for (int j = 0; j < this->numVertices; j++)
+    if (this->mat[v][j] > 0)
+      cout << j << "   ";
+  cout << endl;
+}
+
+int Grafo::grauVertice(int v)
+{
+  int grau = 0;
+  for (int j = 0; j < this->numVertices; j++)
+    if (existeAresta(v, j))
+    {
+      // if (this->mat[v][j] > 0)
+      grau++;
+    }
+  return grau;
+}
+
+bool Grafo::completo()
+{
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    if (this->grauVertice(i) < this->numVertices - 1)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool Grafo::regular()
+{
+  int grauAtual = this->grauVertice(0);
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    if (this->grauVertice(i) != grauAtual)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+// todos os vértices de grau par
+bool Grafo::euleriano()
+{
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    if (this->grauVertice(i) % 2 != 0)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+// conter apenas dois vértices de grau ímpar
+bool Grafo::subeuleriano()
+{
+  int cont = 0;
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    if (this->grauVertice(i) % 2 != 0)
+    {
+      cont++;
+    }
+  }
+
+  return cont == 2 ? true : false;
+}
+
+void Grafo::buscaProfundidade()
+{
+  int *cor = new int[this->numVertices];
+}
 Grafo::~Grafo()
 {
   for (int i = 0; i < numVertices; i++)
