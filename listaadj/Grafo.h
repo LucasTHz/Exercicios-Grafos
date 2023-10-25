@@ -102,6 +102,7 @@ public:
   void kruskal();
   int encontreConjunto(int *conjunto, int x);
   void unirConjunto(int *conjunto, int x, int y);
+  void *prim(int raiz);
 
   ~Grafo();
 };
@@ -514,6 +515,62 @@ void Grafo::unirConjunto(int *conjunto, int x, int y)
   int conjuntoX = encontreConjunto(conjunto, x);
   int conjuntoY = encontreConjunto(conjunto, y);
   conjunto[conjuntoX] = conjuntoY;
+}
+
+void *Grafo::prim(int raiz)
+{
+
+  int n = this->_numVertices();
+  int *antecessor = new int[n];
+  double *peso = new double[n];
+  int *vs = new int[n + 1];
+  int *itensHeap = new int[n];
+
+  for (int u = 0; u < n; u++)
+  {
+    peso[u] = __INT_MAX__;
+    antecessor[u] = -1;
+    itensHeap[u] = 1;
+    vs[u + 1] = u;
+  }
+  peso[raiz] = 0;
+
+  FPHeapMinIndireto Q(peso, vs, n);
+  Q.constroi();
+
+  while (!Q.vazio())
+  {
+    int u = Q.retiraMin();
+    itensHeap[u] = 0;
+    if (!this->listaAdjVazia(u))
+    {
+      Aresta *adj = this->primeiroListaAdj(u);
+      while (adj != NULL)
+      {
+        int v = adj->_v2();
+        if (itensHeap[v] && adj->_peso() < peso[v])
+        {
+          antecessor[v] = u;
+          Q.diminuiChave(v, adj->_peso());
+        }
+        delete adj;
+        adj = this->proxAdj(u);
+      }
+    }
+  }
+  // delete[] antecessor;
+  // delete[] peso;
+  delete[] vs;
+  delete[] itensHeap;
+
+  cout << "Arvore geradora minima:" << endl;
+  for (int i = 0; i < n; i++)
+  {
+    cout << i << ": ";
+    cout << antecessor[i];
+    cout << " (" << peso[i] << ")" << endl;
+  }
+  return 0;
 }
 
 Grafo::~Grafo()
