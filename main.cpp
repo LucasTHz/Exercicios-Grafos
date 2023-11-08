@@ -13,10 +13,12 @@ int main(int argc, char **argv)
     // grafo->imprime();
     // grafo->buscaMenorCaminho(6, 0);
     // grafo->kruskal();
-    grafo->prim(0);
+    // grafo->prim(0);
+    grafo->dijkstra(0, 5); // raiz e destino
+    // grafo->imprimeCaminho(0, 4);
 
     // printf("Grafo original \n");
-    grafo->imprime();
+    // grafo->imprime();
 
     // Ex1: criar e imprimir grafo transposto.
     // printf("Grafo transposto \n");

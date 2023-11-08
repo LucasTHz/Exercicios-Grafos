@@ -103,6 +103,7 @@ public:
   int encontreConjunto(int *conjunto, int x);
   void unirConjunto(int *conjunto, int x, int y);
   void *prim(int raiz);
+  void *dijkstra(int raiz, int destino);
 
   ~Grafo();
 };
@@ -432,7 +433,7 @@ void Grafo::imprimeCaminho(int u, int v, int *antecessor)
 {
 
   if (u == v)
-    cout << v << endl;
+    cout << v << "--";
   else if (antecessor[v] == -1)
   {
 
@@ -441,7 +442,8 @@ void Grafo::imprimeCaminho(int u, int v, int *antecessor)
   else
   {
     imprimeCaminho(u, antecessor[v], antecessor);
-    cout << v << endl;
+    if (v != NULL && antecessor[v] != -1)
+      cout << v << "--";
   }
 }
 void Grafo::buscaMenorCaminho(int u, int v)
@@ -573,6 +575,62 @@ void *Grafo::prim(int raiz)
   return 0;
 }
 
+void *Grafo::dijkstra(int raiz, int destino)
+{
+  int n = this->_numVertices();
+  int *antecessor = new int[n];
+  double *peso = new double[n];
+  int *vs = new int[n + 1];
+  int *itensHeap = new int[n];
+
+  for (int u = 0; u < n; u++)
+  {
+    peso[u] = __INT_MAX__;
+    antecessor[u] = -1;
+    itensHeap[u] = 1;
+    vs[u + 1] = u;
+  }
+  peso[raiz] = 0;
+
+  FPHeapMinIndireto Q(peso, vs, n);
+  Q.constroi();
+
+  while (!Q.vazio())
+  {
+    int u = Q.retiraMin();
+    itensHeap[u] = 0;
+    if (!this->listaAdjVazia(u))
+    {
+      Aresta *adj = this->primeiroListaAdj(u);
+      while (adj != NULL)
+      {
+        int v = adj->_v2();
+        if (itensHeap[v] && (peso[u] + adj->_peso()) < peso[v])
+        {
+          antecessor[v] = u;
+          peso[v] = peso[u] + adj->_peso();
+          Q.diminuiChave(v, peso[v]);
+        }
+        delete adj;
+        adj = this->proxAdj(u);
+      }
+    }
+  }
+  delete[] vs;
+  delete[] itensHeap;
+
+  cout << "Algoritmo Dijkstra:" << endl;
+  for (int i = 0; i < n; i++)
+  {
+    cout << i << ": ";
+    cout << antecessor[i];
+    cout << " (" << peso[i] << ")" << endl;
+  }
+
+  cout << "Caminho minimo:" << endl;
+  imprimeCaminho(raiz, destino, antecessor);
+  return 0;
+}
 Grafo::~Grafo()
 {
   delete[] this->adj;
