@@ -55,6 +55,7 @@ public:
   bool euleriano();
   bool subeuleriano();
   void buscaProfundidade(int v, bool visitados[]);
+  void floydWarshall(int origem, int destino);
   ~Grafo();
 };
 
@@ -296,9 +297,113 @@ bool Grafo::subeuleriano()
   return cont == 2 ? true : false;
 }
 
-void Grafo::buscaProfundidade()
+// void Grafo::buscaProfundidade()
+// {
+//   int *cor = new int[this->numVertices];
+// }
+
+void Grafo::floydWarshall(int origem, int destino)
 {
-  int *cor = new int[this->numVertices];
+  int **distancia = new int *[this->numVertices];
+  int **antecessor = new int *[this->numVertices];
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    distancia[i] = new int[this->numVertices];
+    antecessor[i] = new int[this->numVertices];
+  }
+
+  for (int i = 0; i < this->numVertices; i++)
+    for (int j = 0; j < this->numVertices; j++)
+    {
+      if (i == j) // a distancia entre o vertice e ele mesmo é 0
+      {
+        distancia[i][j] = 0;
+        antecessor[i][j] = -1;
+      }
+      else if (this->mat[i][j] != NULL) // verifica se uma unica aresta conecta os dois vertices
+      {
+        distancia[i][j] = this->mat[i][j];
+        antecessor[i][j] = i;
+      }
+      else
+      {
+        distancia[i][j] = __INT_MAX__;
+        antecessor[i][j] = -1;
+      }
+    }
+
+  for (int k = 0; k < this->numVertices; k++)
+    for (int i = 0; i < this->numVertices; i++)
+      for (int j = 0; j < this->numVertices; j++)
+        if (distancia[i][k] != __INT_MAX__ && distancia[k][j] != __INT_MAX__)
+        {
+
+          if (distancia[i][k] + distancia[k][j] < distancia[i][j])
+          {
+            distancia[i][j] = distancia[i][k] + distancia[k][j];
+            antecessor[i][j] = antecessor[k][j];
+          }
+        }
+
+  cout << "Matriz final" << endl;
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    for (int j = 0; j < this->numVertices; j++)
+    {
+      if (distancia[i][j] == __INT_MAX__)
+        cout << "INF"
+             << "   ";
+      else
+        cout << distancia[i][j] << "   ";
+    }
+    cout << endl;
+  }
+
+  cout << endl
+       << "Matriz de antecessores" << endl;
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    for (int j = 0; j < this->numVertices; j++)
+    {
+      if (antecessor[i][j] == __INT_MAX__)
+        cout << "INF"
+             << "   ";
+      else
+        cout << antecessor[i][j] << "   ";
+    }
+    cout << endl;
+  }
+
+  if (distancia[origem][destino] == __INT_MAX__)
+  {
+    cout << "Não existe caminho entre os vertices" << endl;
+    return;
+  }
+
+  cout << endl
+       << "Menor caminho entre os verticies fornecidos" << endl;
+  int i = origem;
+  int j = destino;
+  cout << "Caminho: " << j << " ";
+  while (antecessor[i][j] != i)
+  {
+    if (antecessor[i][j] == __INT_MAX__)
+    {
+      cout << "Não existe caminho entre os vertices" << endl;
+      return;
+    }
+    cout << antecessor[i][j] << " ";
+    j = antecessor[i][j];
+  }
+  cout << i << endl;
+  cout << "Distancia: " << distancia[origem][destino] << endl;
+  for (int i = 0; i < this->numVertices; i++)
+  {
+    delete[] distancia[i];
+    delete[] antecessor[i];
+  }
+  delete[] distancia;
+  delete[] antecessor;
 }
 Grafo::~Grafo()
 {

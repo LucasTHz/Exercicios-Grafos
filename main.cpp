@@ -1,4 +1,4 @@
-#include "listaadj/Grafo.h"
+#include "matrizadj/Grafo.h"
 #include <fstream>
 using namespace std;
 
@@ -14,7 +14,11 @@ int main(int argc, char **argv)
     // grafo->buscaMenorCaminho(6, 0);
     // grafo->kruskal();
     // grafo->prim(0);
-    grafo->dijkstra(0, 5); // raiz e destino
+    // grafo->dijkstra(0, 5); // raiz e destino
+    cout << "Grafo original" << endl;
+    grafo->imprime();
+
+    grafo->floydWarshall(2, 0);
     // grafo->imprimeCaminho(0, 4);
 
     // printf("Grafo original \n");
