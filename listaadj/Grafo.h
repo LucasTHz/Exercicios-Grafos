@@ -232,7 +232,7 @@ bool Grafo::isDisconnected()
   }
 
   // Começa a busca em profundidade a partir do primeiro vértice
-  this->visitaDfs(0, cor, antecessor);
+  this->buscaProfundidade();
 
   // Verifica se todos os vértices foram visitados
   for (int u = 0; u < this->numVertices; u++)
@@ -667,42 +667,40 @@ void *Grafo::dijkstra(int raiz, int destino)
 void Grafo::cutAresta()
 {
   int apagaoCount = 0;
-  int v = this->_numVertices();
-  Grafo copia = *this; // assumindo que o operador de cópia está implementado corretamente
-  // Grafo *copia = new Grafo(this->numVertices);
+  Grafo *grafoCopia = this;
 
-  for (int i = 0; i < v; i++)
-  {
+  for (int v = 0; v < this->numVertices; v++)
     if (!this->listaAdjVazia(v))
     {
-      Aresta *adj = this->primeiroListaAdj(i);
+      Aresta *adj = this->primeiroListaAdj(v);
+      Aresta *adjCopia = grafoCopia->primeiroListaAdj(v);
+
       while (adj != NULL)
       {
-        // cout << "Removendo aresta: " << i << " " << adj->_v2() << " " << adj->_peso() << endl;
-        Aresta *arestaRemovida = this->retiraAresta(adj->_v1(), adj->_v2());
-        // printar a aresta removida
-        cout << "Aresta removida: " << i << " " << arestaRemovida->_v2() << " " << arestaRemovida->_peso() << endl;
+        cout << "Removendo aresta: " << v << " " << adj->_v2() << " " << adj->_peso() << endl;
+        grafoCopia->retiraAresta(adj->_v1(), adj->_v2());
+        cout << adjCopia->_v1() << " " << adjCopia->_v2() << " " << adjCopia->_peso() << endl;
 
-        this->buscaProfundidade();
+        // cout << "Aresta removida: " << v << " " << arestaRemovida->_v2() << " " << arestaRemovida->_peso() << endl;
 
-        if (this->isDisconnected())
-        { // assumindo que isDisconnected está implementado corretamente
-          apagaoCount++;
-        }
+        // if (this->numComponentes() != 1)
+        // {
+        //   apagaoCount++;
+        // }
 
-        //     // Reinsere a aresta que foi removida
-        if (arestaRemovida != NULL)
-        {
-          this->insereAresta(i, arestaRemovida->_v2(), arestaRemovida->_peso());
-          delete arestaRemovida;
-        }
+        // if (arestaRemovida != NULL)
+        // {
+        //   this->insereAresta(arestaRemovida->_v1(), arestaRemovida->_v2(), arestaRemovida->_peso());
+        //   // delete arestaRemovida;
+        //   cout << "aqui" << endl;
+        // }
+
         delete adj;
-        adj = this->proxAdj(i);
+        adj = this->proxAdj(v);
       }
     }
-  }
 
-  std::cout << "Número de linhas de transmissão que, se falharem, causarão um apagão: " << apagaoCount << std::endl;
+  std::cout << "Número de linhas de transmissão que, se falharem, causarão um apagão: " << apagaoCount << endl;
 }
 Grafo::~Grafo()
 {
