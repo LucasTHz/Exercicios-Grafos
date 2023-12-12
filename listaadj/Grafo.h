@@ -104,6 +104,8 @@ public:
   void unirConjunto(int *conjunto, int x, int y);
   void *prim(int raiz);
   void *dijkstra(int raiz, int destino);
+  void cutAresta();
+  bool isDisconnected();
 
   ~Grafo();
 };
@@ -216,6 +218,36 @@ Grafo *Grafo::grafoTransposto()
       }
     }
   return grafoT;
+}
+
+bool Grafo::isDisconnected()
+{
+  int *cor = new int[this->numVertices];
+  int *antecessor = new int[this->numVertices];
+
+  for (int u = 0; u < this->numVertices; u++)
+  {
+    cor[u] = 0; // 0 é branco, ou seja, não visitado
+    antecessor[u] = -1;
+  }
+
+  // Começa a busca em profundidade a partir do primeiro vértice
+  this->visitaDfs(0, cor, antecessor);
+
+  // Verifica se todos os vértices foram visitados
+  for (int u = 0; u < this->numVertices; u++)
+  {
+    if (cor[u] == 0)
+    { // Se algum vértice não foi visitado, o grafo está desconectado
+      delete[] cor;
+      delete[] antecessor;
+      return true;
+    }
+  }
+
+  delete[] cor;
+  delete[] antecessor;
+  return false; // Se todos os vértices foram visitados, o grafo está conectado
 }
 
 void Grafo::buscaProfundidade()
@@ -630,6 +662,47 @@ void *Grafo::dijkstra(int raiz, int destino)
   cout << "Caminho minimo:" << endl;
   imprimeCaminho(raiz, destino, antecessor);
   return 0;
+}
+
+void Grafo::cutAresta()
+{
+  int apagaoCount = 0;
+  int v = this->_numVertices();
+  Grafo copia = *this; // assumindo que o operador de cópia está implementado corretamente
+  // Grafo *copia = new Grafo(this->numVertices);
+
+  for (int i = 0; i < v; i++)
+  {
+    if (!this->listaAdjVazia(v))
+    {
+      Aresta *adj = this->primeiroListaAdj(i);
+      while (adj != NULL)
+      {
+        // cout << "Removendo aresta: " << i << " " << adj->_v2() << " " << adj->_peso() << endl;
+        Aresta *arestaRemovida = this->retiraAresta(adj->_v1(), adj->_v2());
+        // printar a aresta removida
+        cout << "Aresta removida: " << i << " " << arestaRemovida->_v2() << " " << arestaRemovida->_peso() << endl;
+
+        this->buscaProfundidade();
+
+        if (this->isDisconnected())
+        { // assumindo que isDisconnected está implementado corretamente
+          apagaoCount++;
+        }
+
+        //     // Reinsere a aresta que foi removida
+        if (arestaRemovida != NULL)
+        {
+          this->insereAresta(i, arestaRemovida->_v2(), arestaRemovida->_peso());
+          delete arestaRemovida;
+        }
+        delete adj;
+        adj = this->proxAdj(i);
+      }
+    }
+  }
+
+  std::cout << "Número de linhas de transmissão que, se falharem, causarão um apagão: " << apagaoCount << std::endl;
 }
 Grafo::~Grafo()
 {

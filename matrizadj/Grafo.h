@@ -56,6 +56,7 @@ public:
   bool subeuleriano();
   void buscaProfundidade(int v, bool visitados[]);
   void floydWarshall(int origem, int destino);
+  void cutAresta();
   ~Grafo();
 };
 
@@ -405,6 +406,15 @@ void Grafo::floydWarshall(int origem, int destino)
   delete[] distancia;
   delete[] antecessor;
 }
+
+/*
+fazer um algoritmo que utiliza a ideia de conectividade de grafos que resolva o
+ o seguinte problem: Considere uma rede de distribuição de energia onde a conectividade torna-se o menor número
+ de linha de transmissão entre as torres cuja falha causaria um apagão.Quantas linhas precisam
+falhar(no mínimo) para termos um apagão?
+
+*/
+
 Grafo::~Grafo()
 {
   for (int i = 0; i < numVertices; i++)
