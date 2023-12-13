@@ -106,6 +106,7 @@ public:
   void *dijkstra(int raiz, int destino);
   void cutAresta();
   bool isDisconnected();
+  Grafo *grafoCopia();
 
   ~Grafo();
 };
@@ -215,6 +216,7 @@ Grafo *Grafo::grafoTransposto()
         grafoT->insereAresta(adj->_v2(), adj->_v1(), adj->_peso());
         delete adj;
         adj = this->proxAdj(v);
+        cout << adj << endl;
       }
     }
   return grafoT;
@@ -664,44 +666,80 @@ void *Grafo::dijkstra(int raiz, int destino)
   return 0;
 }
 
-void Grafo::cutAresta()
+Grafo *Grafo::grafoCopia()
 {
-  int apagaoCount = 0;
-  Grafo *grafoCopia = this;
-
+  Grafo *copia = new Grafo(this->numVertices);
   for (int v = 0; v < this->numVertices; v++)
     if (!this->listaAdjVazia(v))
     {
       Aresta *adj = this->primeiroListaAdj(v);
-      Aresta *adjCopia = grafoCopia->primeiroListaAdj(v);
-
       while (adj != NULL)
       {
-        cout << "Removendo aresta: " << v << " " << adj->_v2() << " " << adj->_peso() << endl;
-        grafoCopia->retiraAresta(adj->_v1(), adj->_v2());
-        cout << adjCopia->_v1() << " " << adjCopia->_v2() << " " << adjCopia->_peso() << endl;
-
-        // cout << "Aresta removida: " << v << " " << arestaRemovida->_v2() << " " << arestaRemovida->_peso() << endl;
-
-        // if (this->numComponentes() != 1)
-        // {
-        //   apagaoCount++;
-        // }
-
-        // if (arestaRemovida != NULL)
-        // {
-        //   this->insereAresta(arestaRemovida->_v1(), arestaRemovida->_v2(), arestaRemovida->_peso());
-        //   // delete arestaRemovida;
-        //   cout << "aqui" << endl;
-        // }
-
+        copia->insereAresta(adj->_v1(), adj->_v2(), adj->_peso());
         delete adj;
         adj = this->proxAdj(v);
       }
     }
-
-  std::cout << "Número de linhas de transmissão que, se falharem, causarão um apagão: " << apagaoCount << endl;
+  return copia;
 }
+
+void Grafo::cutAresta()
+{
+  int apagaoCount = 0;
+  Grafo grafoTeste = *this; // Copia o grafo original para não modificar diretamente
+
+  for (int v = 0; v < this->numVertices; v++)
+  {
+    if (!grafoTeste.listaAdjVazia(v) && !this->listaAdjVazia(v))
+    {
+      // Armazena as arestas a serem removidas e reinstaladas
+      std::vector<Aresta *> arestasRemovidas;
+
+      Aresta *adj = this->primeiroListaAdj(v);
+
+      // Itera sobre os vértices adjacentes e remove as arestas
+      while (adj != NULL)
+      {
+        // Realiza a cópia da aresta para possível restauração
+        Aresta *aresta = new Aresta(v, adj->_v2(), adj->_peso());
+
+        // Adiciona a aresta à lista de remoção
+        arestasRemovidas.push_back(aresta);
+
+        // Move para a próxima aresta na lista de adjacência
+        adj = this->proxAdj(v);
+      }
+
+      // Remove as arestas e verifica a desconexão
+      for (Aresta *aresta : arestasRemovidas)
+      {
+        // Remove a aresta do grafo de teste
+        grafoTeste.retiraAresta(aresta->_v1(), aresta->_v2());
+
+        // Verifica se o grafo de teste está desconectado
+        if (grafoTeste.numComponentes() > 1)
+        {
+          apagaoCount++;
+          cout << "Aresta de corte: " << aresta->_v1() << " " << aresta->_v2() << " " << aresta->_peso() << endl;
+        }
+      }
+
+      // Restaura as arestas removidas
+      for (Aresta *aresta : arestasRemovidas)
+      {
+        grafoTeste.insereAresta(aresta->_v1(), aresta->_v2(), aresta->_peso());
+        delete aresta;
+      }
+    }
+  }
+  if (apagaoCount == this->numVertices - 1)
+  {
+    cout << "Número de linhas de transmissão que, se falharem, causarão um apagão: " << 1 << endl;
+  }
+  else
+    std::cout << "Número de linhas de transmissão que, se falharem, causarão um apagão: " << apagaoCount << endl;
+}
+
 Grafo::~Grafo()
 {
   delete[] this->adj;
